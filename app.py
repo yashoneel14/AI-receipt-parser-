@@ -47,7 +47,7 @@ def get_expenses():
     res = (
         get_supabase()
         .table("expenses")
-        .select("id, item, cost, expense_type, created_at")
+        .select("item, cost, expense_type, created_at")
         .order("created_at", desc=True)
         .execute()
     )
@@ -164,9 +164,9 @@ if uploaded_file is not None:
                             price_val = float(row.get("Price", 0.0))
                             if item_val:
                                 add_expense(item_val, price_val, cat_val)
-                        st.markdown('<p style="color:#ffffff;font-weight:600;">Saved items to Supabase database.</p>', unsafe_allow_html=True)
+                        st.markdown('<p style="color:#ffffff;font-weight:600;">Saved items to database.</p>', unsafe_allow_html=True)
                     except Exception as e:
-                        st.markdown(f'<p style="color:#ffffff;font-weight:600;">Supabase save error: {e}</p>', unsafe_allow_html=True)
+                        st.markdown(f'<p style="color:#ffffff;font-weight:600;">Database save error: {e}</p>', unsafe_allow_html=True)
 
     with st.expander("View Raw OCR Text"):
         st.text(extracted_text)
