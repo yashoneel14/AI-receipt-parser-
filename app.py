@@ -198,12 +198,12 @@ else:
    
 # making sure database is persistant     
 st.markdown("---")
-st.markdown('<h3 style="color:#107AB0;">Saved Expenses (Supabase Database)</h3>', unsafe_allow_html=True)
+st.markdown('<h3 style="color:#107AB0;">Saved Expenses </h3>', unsafe_allow_html=True)
 try:
     db_rows = get_expenses()
     if db_rows:
-        db_df = pd.DataFrame(db_rows)
-        st.dataframe(db_df, use_container_width=True)
+        db_df = pd.DataFrame(db_rows).drop(columns=["id"], errors="ignore")
+        st.dataframe(db_df, use_container_width=True, hide_index=True)
     else:
         st.markdown('<p style="color:#ffffff;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
 except Exception as e:
