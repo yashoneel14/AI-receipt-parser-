@@ -1,4 +1,5 @@
 import streamlit as st
+from supabase import create_client
 import cv2
 import pytesseract
 import pandas as pd
@@ -27,6 +28,30 @@ st.write("Upload a receipt to automatically split and categorize individual purc
 if 'expenses' not in st.session_state:
     st.session_state.expenses = pd.DataFrame(columns=["Item Name", "Category", "Price"])
 
+#SUPABASE CONNECTION 
+@st.cache_resource
+def get_supabase():
+    return create_client(
+        st.secrets["SUPABASE_URL"],
+        st.secrets["SUPABASE_KEY"],
+    )
+
+def add_expense(item: str, cost: float, expense_type: str):
+    get_supabase().table("expenses").insert({
+        "item": item,
+        "cost": cost,
+        "expense_type": expense_type,
+    }).execute()
+
+def get_expenses():
+    res = (
+        get_supabase()
+        .table("expenses")
+        .select("id, item, cost, expense_type, created_at")
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return res.data
 # Image Preprocessing 
 def preprocess_image(image):
     open_cv_image = np.array(image.convert('RGB'))
@@ -130,6 +155,17 @@ if uploaded_file is not None:
                 if submit_button:
                     st.session_state.expenses = pd.concat([st.session_state.expenses, edited_df], ignore_index=True)
                     st.success("Items successfully added and categorized!")
+                    # save items to database 
+                    try:
+                        for _, row in edited_df.iterrows():
+                            item_val = str(row.get("Item Name", "")).strip()
+                            cat_val = str(row.get("Category", "General Expense")).strip()
+                            price_val = float(row.get("Price", 0.0))
+                            if item_val:
+                                add_expense(item_val, price_val, cat_val)
+                        st.markdown('<p style="color:#ff4b4b;font-weight:600;">Saved items to Supabase database.</p>', unsafe_allow_html=True)
+                    except Exception as e:
+                        st.markdown(f'<p style="color:#ff4b4b;font-weight:600;">Supabase save error: {e}</p>', unsafe_allow_html=True)
 
     with st.expander("View Raw OCR Text"):
         st.text(extracted_text)
@@ -158,3 +194,16 @@ if not st.session_state.expenses.empty:
         st.dataframe(st.session_state.expenses, use_container_width=True)
 else:
     st.info("No items processed yet. Upload a receipt above to populate your itemized dashboard!")
+   
+# making sure database is persistant     
+st.markdown("---")
+st.markdown('<h3 style="color:#ff4b4b;">Saved Expenses (Supabase Database)</h3>', unsafe_allow_html=True)
+try:
+    db_rows = get_expenses()
+    if db_rows:
+        db_df = pd.DataFrame(db_rows)
+        st.dataframe(db_df, use_container_width=True)
+    else:
+        st.markdown('<p style="color:#ff4b4b;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
+except Exception as e:
+    st.markdown(f'<p style="color:#ff4b4b;">Could not load expenses from Supabase: {e}</p>', unsafe_allow_html=True)
