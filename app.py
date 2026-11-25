@@ -26,7 +26,7 @@ st.write("Upload a receipt to automatically split and categorize individual purc
 
 # Initialising session state to store individual transactions
 if 'expenses' not in st.session_state:
-    st.session_state.expenses = pd.DataFrame(columns=["Item Name", "Category", "Price"])
+    st.session_state.expenses = pd.DataFrame(columns=["Item Name", "Category", "Price"], hide_index=True)
 
 #SUPABASE CONNECTION 
 @st.cache_resource
