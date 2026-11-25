@@ -155,6 +155,7 @@ if uploaded_file is not None:
                 if submit_button:
                     st.session_state.expenses = pd.concat([st.session_state.expenses, edited_df], ignore_index=True)
                     st.success("Items successfully added and categorized!")
+                    
                     # save items to database 
                     try:
                         for _, row in edited_df.iterrows():
@@ -163,9 +164,9 @@ if uploaded_file is not None:
                             price_val = float(row.get("Price", 0.0))
                             if item_val:
                                 add_expense(item_val, price_val, cat_val)
-                        st.markdown('<p style="color:#ff4b4b;font-weight:600;">Saved items to Supabase database.</p>', unsafe_allow_html=True)
+                        st.markdown('<p style="color:#000000;font-weight:600;">Saved items to Supabase database.</p>', unsafe_allow_html=True)
                     except Exception as e:
-                        st.markdown(f'<p style="color:#ff4b4b;font-weight:600;">Supabase save error: {e}</p>', unsafe_allow_html=True)
+                        st.markdown(f'<p style="color:#000000;font-weight:600;">Supabase save error: {e}</p>', unsafe_allow_html=True)
 
     with st.expander("View Raw OCR Text"):
         st.text(extracted_text)
@@ -204,6 +205,6 @@ try:
         db_df = pd.DataFrame(db_rows)
         st.dataframe(db_df, use_container_width=True)
     else:
-        st.markdown('<p style="color:#ff4b4b;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="color:#000000;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
 except Exception as e:
-    st.markdown(f'<p style="color:#ff4b4b;">Could not load expenses from Supabase: {e}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="color:#000000;">Could not load expenses from Supabase: {e}</p>', unsafe_allow_html=True)
