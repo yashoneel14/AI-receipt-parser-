@@ -52,6 +52,10 @@ def get_expenses():
         .execute()
     )
     return res.data
+
+#for deletion
+def delete_expense(expense_id: int):
+    get_supabase().table("expenses").delete().eq("id", expense_id).execute()
 # Image Preprocessing 
 def preprocess_image(image):
     open_cv_image = np.array(image.convert('RGB'))
@@ -202,9 +206,31 @@ st.markdown('<h3 style="color:#107AB0;">Saved Expenses </h3>', unsafe_allow_html
 try:
     db_rows = get_expenses()
     if db_rows:
-        db_df = pd.DataFrame(db_rows)
+        db_df = pd.DataFrame(db_rows).drop(columns=["id"], errors="ignore")
         st.dataframe(db_df, use_container_width=True, hide_index=True)
+
+        # Let user pick a row to delete
+        options = {
+            f"{row['item']} — ${row['cost']} ({row['expense_type']}) [ID {row['id']}]": row["id"]
+            for row in db_rows
+        }
+        selected_label = st.selectbox("Select an item to delete:", list(options.keys()))
+
+        if st.button("Delete Selected Expense"):
+            delete_expense(options[selected_label])
+            st.rerun()
     else:
-        st.markdown('<p style="color:#ffffff;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="color:#107AB0;">No rows saved in database yet.</p>', unsafe_allow_html=True)
 except Exception as e:
-    st.markdown(f'<p style="color:#ffffff;">Could not load expenses from Supabase: {e}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="color:#107AB0;">Could not load expenses from database: {e}</p>', unsafe_allow_html=True)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    107AB0
