@@ -25,7 +25,7 @@ st.write("Upload a receipt to automatically split and categorize individual purc
 
 # Initialising session state to store individual transactions
 if 'expenses' not in st.session_state:
-    st.session_state.expenses = pd.DataFrame(columns=["Item Name", "Category", "Price", "Merchant"])
+    st.session_state.expenses = pd.DataFrame(columns=["Item Name", "Category", "Price"])
 
 # Image Preprocessing 
 def preprocess_image(image):
@@ -41,11 +41,10 @@ def parse_line_items(text):
     lines = [line.strip() for line in text.split('\n') if line.strip()]
     
     # Try to extract merchant name from first non-empty line
-    merchant = lines[0] if lines else "Unknown Merchant"
     itemized_list = []
     
     #  words to ignore
-    skip_keywords = ["expires", "subtotal", "tax", "total", "visa", "charge", "rec#", "vcd#", "thank", "come", "discount", "cash", "balance"]
+    skip_keywords = ["expires", "total", "visa", "charge", "rec#", "vcd#", "thank", "come", "discount", "cash", "balance", "debit", "card", "%"]
     
     for line in lines:
         line_lower = line.lower()
@@ -69,31 +68,32 @@ def parse_line_items(text):
                 
             # Keyword based categorization
             item_lower = item_name.lower()
-            if any(k in item_lower for k in ["tv", "led", "bluetooth", "electronic", "phone", "gadget", "device", "mobile", "smart-phone", "headphones", "earphones", "airpods", "earpods", "watch", "smart", ]):
+            if any(k in item_lower for k in ["tv", "led", "bluetooth", "electronic", "phone", "gadget", "device", "mobile", "smart-phone", "headphones", "earphones", "airpods", "earpods", "watch", "smart"]):
                 category = "Electronics"
-            elif any(k in item_lower for k in ["shampoo", "conditioner", "health", "beauty", "soap", "cream", "pharmacy"]):
-                category = "Health & Beauty"
-            elif any(k in item_lower for k in ["food", "grocery", "milk", "bread", "cafe", "coffee", "snack", "water"]):
+            elif any(k in item_lower for k in ["shampoo", "conditioner", "health", "beauty", "soap", "cream", "pharmacy", "face", "medicine", "cream", "tablets"]):
+                category = "Health & Self-Care"
+            elif any(k in item_lower for k in ["food", "grocery", "milk", "eggs", "bread", "cafe", "tea", "coffee", "snack", "water", "lunch", "dinner", "breakfast", "brunch", "biscuits", "chocolates", "fruits", "vegetables"]):
                 category = "Food & Groceries"
-            elif any(k in item_lower for k in ["shirt", "pants", "shoes", "cloth", "wear", "apparel"]):
-                category = "Apparel & Shopping"
+            elif any(k in item_lower for k in ["shirt", "pants", "shoes", "cloth", "wear", "jeans", "socks", "t-shirt", "trousers", "chain", "bracelet", "necklace", "sandals", "skirt", "frock", "crop", "top", "denim", "clip"]):
+                category = "Shopping"
+            elif any(k in item_lower for k in ["tax", "taxes", "GST", "CGST", "SGST"]):
+                category = "tax"
             else:
                 category = "General Expense"
                 
             itemized_list.append({
                 "Item Name": item_name,
                 "Category": category,
-                "Price": price,
-                "Merchant": merchant
+                "Price": price
             })
             
     # If OCR returns nothing valid, the dashboard provides a blank row so the user can type themselves manually
     if not itemized_list:
+        st.write("We are having issues identifying the purchase. Mind filling it up manually?")
         itemized_list.append({
             "Item Name": "",
             "Category": "General Expense",
-            "Price": 0.0,
-            "Merchant": merchant
+            "Price": 0.0
         })
         
     return itemized_list
@@ -136,14 +136,14 @@ if uploaded_file is not None:
 
 # Dashboard Section
 st.markdown("---")
-st.header("📊 Itemized Spending Analytics Dashboard")
+st.header("📊 Purchase Analytics")
 
 if not st.session_state.expenses.empty:
     m1, m2 = st.columns(2)
     total_spent = st.session_state.expenses["Price"].sum()
     total_items = len(st.session_state.expenses)
     
-    m1.metric("Total Tracked Spending", f"₹{total_spent:,.2f}")
+    m1.metric("Total Tracked Spending", f"${total_spent:,.2f}")
     m2.metric("Total Items Logged", total_items)
     
     col_chart1, col_chart2 = st.columns(2)
