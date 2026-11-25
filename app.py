@@ -148,7 +148,7 @@ if uploaded_file is not None:
                 
                 temp_df = pd.DataFrame(parsed_items)
                 # num_rows="dynamic" lets you click '+' to add rows manually if OCR misses something
-                edited_df = st.data_editor(temp_df, use_container_width=True, num_rows="dynamic")
+                edited_df = st.data_editor(temp_df, use_container_width=True, num_rows="dynamic", hide_index=True)
                 
                 submit_button = st.form_submit_button("Add Items to Dashboard")
                 
