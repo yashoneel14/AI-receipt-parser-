@@ -212,7 +212,7 @@ try:
 
         # Let user pick a row to delete
         options = {
-            f"{row['item']}: ${row['cost']} ({row['expense_type']})"
+            f"{row['item']} : ${row['cost']} ({row['expense_type']})": row["id"]
             for row in db_rows
         }
         selected_label = st.selectbox("Select an item to delete:", list(options.keys()))
