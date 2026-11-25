@@ -202,7 +202,7 @@ st.markdown('<h3 style="color:#107AB0;">Saved Expenses </h3>', unsafe_allow_html
 try:
     db_rows = get_expenses()
     if db_rows:
-        db_df = pd.DataFrame(db_rows).drop(columns=["id"], errors="ignore")
+        db_df = pd.DataFrame(db_rows)
         st.dataframe(db_df, use_container_width=True, hide_index=True)
     else:
         st.markdown('<p style="color:#ffffff;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
