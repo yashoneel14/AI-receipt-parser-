@@ -164,9 +164,9 @@ if uploaded_file is not None:
                             price_val = float(row.get("Price", 0.0))
                             if item_val:
                                 add_expense(item_val, price_val, cat_val)
-                        st.markdown('<p style="color:#000000;font-weight:600;">Saved items to Supabase database.</p>', unsafe_allow_html=True)
+                        st.markdown('<p style="color:#ffffff;font-weight:600;">Saved items to Supabase database.</p>', unsafe_allow_html=True)
                     except Exception as e:
-                        st.markdown(f'<p style="color:#000000;font-weight:600;">Supabase save error: {e}</p>', unsafe_allow_html=True)
+                        st.markdown(f'<p style="color:#ffffff;font-weight:600;">Supabase save error: {e}</p>', unsafe_allow_html=True)
 
     with st.expander("View Raw OCR Text"):
         st.text(extracted_text)
@@ -198,13 +198,13 @@ else:
    
 # making sure database is persistant     
 st.markdown("---")
-st.markdown('<h3 style="color:#ff4b4b;">Saved Expenses (Supabase Database)</h3>', unsafe_allow_html=True)
+st.markdown('<h3 style="color:#107AB0;">Saved Expenses (Supabase Database)</h3>', unsafe_allow_html=True)
 try:
     db_rows = get_expenses()
     if db_rows:
         db_df = pd.DataFrame(db_rows)
         st.dataframe(db_df, use_container_width=True)
     else:
-        st.markdown('<p style="color:#000000;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="color:#ffffff;">No rows saved in Supabase yet.</p>', unsafe_allow_html=True)
 except Exception as e:
-    st.markdown(f'<p style="color:#000000;">Could not load expenses from Supabase: {e}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="color:#ffffff;">Could not load expenses from Supabase: {e}</p>', unsafe_allow_html=True)
