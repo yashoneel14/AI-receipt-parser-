@@ -47,7 +47,7 @@ def get_expenses():
     res = (
         get_supabase()
         .table("expenses")
-        .select("item, cost, expense_type, created_at")
+        .select("id, item, cost, expense_type, created_at")
         .order("created_at", desc=True)
         .execute()
     )
@@ -56,6 +56,7 @@ def get_expenses():
 #for deletion
 def delete_expense(expense_id: int):
     get_supabase().table("expenses").delete().eq("id", expense_id).execute()
+    
 # Image Preprocessing 
 def preprocess_image(image):
     open_cv_image = np.array(image.convert('RGB'))
