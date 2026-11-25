@@ -223,14 +223,3 @@ try:
         st.markdown('<p style="color:#107AB0;">No rows saved in database yet.</p>', unsafe_allow_html=True)
 except Exception as e:
     st.markdown(f'<p style="color:#107AB0;">Could not load expenses from database: {e}</p>', unsafe_allow_html=True)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    107AB0
