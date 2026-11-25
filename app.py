@@ -54,8 +54,11 @@ def get_expenses():
     return res.data
 
 #for deletion
-def delete_expense(expense_id: int):
-    get_supabase().table("expenses").delete().eq("id", expense_id).execute()
+def delete_expense(expense_ids):
+    if isinstance(expense_ids, int):
+        expense_ids = [expense_ids]
+    if expense_ids:
+        get_supabase().table("expenses").delete().in_("id", expense_ids).execute()
     
 # Image Preprocessing 
 def preprocess_image(image):
@@ -215,10 +218,11 @@ try:
             f"{row['item']} : ${row['cost']} ({row['expense_type']})": row["id"]
             for row in db_rows
         }
-        selected_label = st.selectbox("Select an item to delete:", list(options.keys()))
+        selected_labels = st.multiselect("Select item(s) to delete:", list(options.keys()))
 
-        if st.button("Delete Selected Expense"):
-            delete_expense(options[selected_label])
+        if st.button("Delete Selected Expenses", disabled=not selected_labels):
+            selected_ids = [options[label] for label in selected_labels]
+            delete_expense(selected_ids)
             st.rerun()
     else:
         st.markdown('<p style="color:#107AB0;">No rows saved in database yet.</p>', unsafe_allow_html=True)
